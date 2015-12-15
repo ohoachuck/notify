@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Author: Olivier HO-A-CHUCK
+# Date: 15th Dec 2015
+# Usage: notify <title> <subtitle> <message>
+#
+# More info:
+# Apple documentation on display notification can be found here:
+# https://developer.apple.com/library/mac/documentation/AppleScript/Conceptual/AppleScriptLangGuide/reference/ASLR_cmds.html#//apple_ref/doc/uid/TP40000983-CH216-SW224
+# Note: to change the icon of notification, this should be possible by creating an AppleScript bundle and change the icon here.
+# See: http://stackoverflow.com/questions/19627018/change-the-icon-of-an-applescript-called-notification
+
+VERSION="1.0"
+AIFF="Purr.aiff"
+TITLE="Demo notification"
+SUBTITLE='Provided by \"notify\" script'
+MESSAGE="📝 Author: Olivier HO-A-CHUCK Dec. 2015"
+VERBOSE=false
+
+while getopts ":hvt:s:m:a:" opt; do
+  case $opt in
+    h)
+	  	echo "`basename $0` (version ${VERSION})" >&2
+      echo "Author: Olivier HO-A-CHUCK (http://blog.hoachuck.biz)" >&2
+      echo "" >&2
+	  	echo "Usage: 	`basename $0` [-t <Title>] [-s <Subtitle>] [-m <Message>] [-a <Sound path>] [- v (this is verbose mode)]" >&2
+      echo "" >&2
+	  	echo "This script use Applescript command \"display notification\"" >&2
+      echo "Exemple usage:	`basename $0` -t \"Demo Title\" -s \"This is Subtitle\" -m \"I love this convenient script\" -a \"Basso.aiff\"" >&2
+      echo "Where .aiff available sound files names could be found in /System/Library/Sounds/" >&2
+      echo "" >&2
+      exit 0;
+      ;;
+    t)
+      	TITLE=${OPTARG}
+      	;;
+    s)
+      	SUBTITLE=${OPTARG}
+      	;;
+    m)
+      	MESSAGE=${OPTARG}
+      	;;
+    a)
+      	AIFF=${OPTARG}
+      	;;
+    v)
+      	VERBOSE=true
+      	;;
+    \?)
+      	echo "Invalid option: -$OPTARG" >&2
+      	echo "For help, please use: $0 -h"  >&2
+      	exit 1
+      	;;
+    :)
+      	echo "Option -$OPTARG requires an argument." >&2
+      	exit 1
+      	;;
+  esac
+done
+
+COMMAND="display notification \"${MESSAGE}\" with title \"${TITLE}\" subtitle \"${SUBTITLE}\" sound name \"${AIFF}\""
+if [ ${VERBOSE} == true ];
+	then
+		`/usr/bin/osascript -e  "${COMMAND}"`
+	else
+		`/usr/bin/osascript -e  "${COMMAND}" 2> /dev/null`
+fi
+
+if [ $# -eq "0" ];
+then
+	echo "`basename $0` -h for help" >&2
+fi
